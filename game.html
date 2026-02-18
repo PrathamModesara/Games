@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Basic Car Game</title>
+	<style>
+		body {
+			background: #222;
+		#gameCanvas {
+			background: #444;
+			border: 2px solid #fff;
+		.instructions {
+			color: #fff;
+			margin-bottom: 20px;
+	</style>
+	<script>
+		// Game variables
+	const canvas = document.getElementById('gameCanvas');
+	const ctx = canvas.getContext('2d');
+	const roadWidth = 300;
+	const carWidth = 50;
+	const carHeight = 80;
+	let carX = (canvas.width - carWidth) / 2;
+	const carY = canvas.height - carHeight - 10;
+	let leftPressed = false;
+	let rightPressed = false;
+	let obstacles = [];
+	let score = 0;
+	let gameOver = false;
+		function drawRoad() {
+			ctx.fillStyle = '#888';
+			ctx.fillRect((canvas.width - roadWidth) / 2, 0, roadWidth, canvas.height);
+		function drawCar() {
+			ctx.fillStyle = '#0f0';
+			ctx.fillRect(carX, carY, carWidth, carHeight);
+		function drawObstacles() {
+			ctx.fillStyle = '#f00';
+			obstacles.forEach(ob => {
+		function moveCar() {
+			if (leftPressed && carX > (canvas.width - roadWidth) / 2) {
+				carX -= 5;
+		function createObstacle() {
+			const obsWidth = 50;
+			const obsHeight = 40;
+			obstacles.push({ x: obsX, y: -obsHeight, width: obsWidth, height: obsHeight });
+		}
+
+		function moveObstacles() {
+			obstacles.forEach(ob => {
+				ob.y += 6;
+			});
+		function checkCollision() {
+			for (let ob of obstacles) {
+				if (
+					carX < ob.x + ob.width &&
+					carX + carWidth > ob.x &&
+					carY < ob.y + ob.height &&
+					carY + carHeight > ob.y
+				) {
+					gameOver = true;
+		function drawScore() {
+			ctx.fillStyle = '#fff';
+			ctx.font = '24px Arial';
+		function gameLoop() {
+			if (gameOver) {
+				ctx.fillStyle = 'rgba(0,0,0,0.7)';
+				ctx.fillText('Game Over!', canvas.width / 2 - 100, canvas.height / 2);
+				ctx.font = '24px Arial';
+				ctx.fillText('Score: ' + score, canvas.width / 2 - 50, canvas.height / 2 + 40);
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			drawRoad();
+			drawCar();
+			drawObstacles();
+			drawScore();
+			moveCar();
+			moveObstacles();
+			checkCollision();
+			score++;
+			if (Math.random() < 0.03) {
+				createObstacle();
+			}
+			requestAnimationFrame(gameLoop);
+		}
+
+		document.addEventListener('keydown', function(e) {
+			if (e.key === 'ArrowLeft') leftPressed = true;
+			if (e.key === 'ArrowRight') rightPressed = true;
+		});
+		document.addEventListener('keyup', function(e) {
+			if (e.key === 'ArrowLeft') leftPressed = false;
+			if (e.key === 'ArrowRight') rightPressed = false;
+		});
+
+		// Touch slide support for mobile
+		let touchStartX = null;
+		canvas.addEventListener('touchstart', function(e) {
+			if (e.touches.length === 1) {
+				touchStartX = e.touches[0].clientX;
+			}
+		});
+		canvas.addEventListener('touchend', function(e) {
+			if (touchStartX === null) return;
+			let touchEndX = e.changedTouches[0].clientX;
+			let diff = touchEndX - touchStartX;
+			if (Math.abs(diff) > 30) { // Minimum slide distance
+				if (diff < 0 && carX > (canvas.width - roadWidth) / 2) {
+					// Slide left
+					carX -= 60;
+				} else if (diff > 0 && carX < (canvas.width + roadWidth) / 2 - carWidth) {
+					// Slide right
+					carX += 60;
+				}
+			}
+			touchStartX = null;
+		});
+
+		gameLoop();
+	</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Eco Rush: Basic Car Game</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Bungee&family=Nunito:wght@400;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			:root {
+				--night: #121425;
+				--ink: #1c2040;
+				--mint: #2ae6a1;
+				--sun: #ffd166;
+				--sky: #57b8ff;
+				--leaf: #4ad66d;
+				--smoke: #5a6078;
+				--card: rgba(255, 255, 255, 0.92);
+				--stroke: rgba(18, 20, 37, 0.12);
+				--shadow: 0 24px 60px rgba(18, 20, 37, 0.22);
+				--glow: 0 0 0 6px rgba(42, 230, 161, 0.2);
+			}
+
+			* {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+
+			body {
+				min-height: 100vh;
+				font-family: "Nunito", "Segoe UI", sans-serif;
+				color: var(--ink);
+				background: radial-gradient(circle at 15% 15%, #fff1c9 0%, #c9f7eb 38%, #b6d9ff 100%);
+				display: flex;
+				justify-content: center;
+				padding: 32px 18px 70px;
+			}
+
+			main {
+				max-width: 1100px;
+				width: 100%;
+				position: relative;
+				overflow: hidden;
+				border-radius: 32px;
+				background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.72));
+				box-shadow: var(--shadow);
+				border: 1px solid rgba(255, 255, 255, 0.85);
+				padding: 40px;
+			}
+
+			header {
+				display: grid;
+				gap: 12px;
+				margin-bottom: 24px;
+			}
+
+			.eyebrow {
+				font-size: 0.88rem;
+				letter-spacing: 0.35em;
+				text-transform: uppercase;
+				color: rgba(28, 32, 64, 0.7);
+			}
+
+			h1 {
+				font-family: "Bungee", "Arial Black", sans-serif;
+				font-size: clamp(2.2rem, 5vw, 3.8rem);
+				line-height: 1.05;
+				text-transform: uppercase;
+			}
+
+			h1 span {
+				color: var(--leaf);
+			}
+
+			.lead {
+				font-size: 1.02rem;
+				max-width: 700px;
+				color: rgba(28, 32, 64, 0.78);
+				line-height: 1.6;
+			}
+
+			.layout {
+				display: grid;
+				grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+				gap: 26px;
+				align-items: start;
+			}
+
+			.panel {
+				background: var(--card);
+				border: 1px solid var(--stroke);
+				border-radius: 22px;
+				padding: 22px;
+				backdrop-filter: blur(6px);
+				box-shadow: 0 16px 30px rgba(18, 20, 37, 0.08);
+			}
+
+			.panel h2 {
+				font-family: "Bungee", "Arial Black", sans-serif;
+				font-size: 1.4rem;
+				margin-bottom: 12px;
+			}
+
+			.hud {
+				display: grid;
+				gap: 10px;
+				margin-bottom: 14px;
+			}
+
+			.hud-row {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				gap: 12px;
+				font-weight: 700;
+			}
+
+			.energy-bar {
+				height: 12px;
+				border-radius: 999px;
+				background: rgba(18, 20, 37, 0.15);
+				overflow: hidden;
+			}
+
+			.energy-fill {
+				height: 100%;
+				width: 60%;
+				background: linear-gradient(90deg, #2ae6a1 0%, #54f0d4 100%);
+				box-shadow: var(--glow);
+				transition: width 0.2s ease;
+			}
+
+			.game-wrap {
+				position: relative;
+				border-radius: 22px;
+				padding: 14px;
+				background: linear-gradient(180deg, #bfe3ff 0%, #e6f7ff 45%, #b9f0d0 100%);
+				border: 2px solid rgba(18, 20, 37, 0.12);
+			}
+
+			canvas {
+				width: 100%;
+				height: 420px;
+				border-radius: 16px;
+				display: block;
+				background: linear-gradient(180deg, #cfe8ff 0%, #eaf7ff 45%, #c4f3d5 100%);
+			}
+
+			.controls {
+				display: grid;
+				grid-template-columns: repeat(3, minmax(0, 1fr));
+				gap: 10px;
+				margin-top: 14px;
+			}
+
+			.control-btn {
+				border: none;
+				padding: 12px 10px;
+				border-radius: 14px;
+				font-weight: 700;
+				cursor: pointer;
+				background: rgba(18, 20, 37, 0.08);
+				color: var(--ink);
+				transition: transform 0.15s ease, box-shadow 0.15s ease;
+			}
+
+			.control-btn.primary {
+				background: var(--night);
+				color: #fff;
+				box-shadow: 0 12px 24px rgba(18, 20, 37, 0.2);
+			}
+
+			.control-btn:hover {
+				transform: translateY(-2px);
+			}
+
+			.status-pill {
+				display: inline-flex;
+				gap: 8px;
+				align-items: center;
+				padding: 8px 12px;
+				border-radius: 999px;
+				background: rgba(87, 184, 255, 0.16);
+				border: 1px solid rgba(87, 184, 255, 0.25);
+				font-weight: 700;
+				font-size: 0.85rem;
+				margin-top: 10px;
+			}
+
+			.list {
+				list-style: none;
+				display: grid;
+				gap: 10px;
+				color: rgba(28, 32, 64, 0.78);
+			}
+
+			.list li {
+				display: grid;
+				grid-template-columns: 120px 1fr;
+				gap: 10px;
+			}
+
+			.list span {
+				font-weight: 700;
+				color: var(--ink);
+			}
+
+			.levels {
+				display: grid;
+				gap: 12px;
+			}
+
+			.level {
+				padding: 12px;
+				border-radius: 16px;
+				background: rgba(18, 20, 37, 0.06);
+				border: 1px solid rgba(18, 20, 37, 0.1);
+			}
+
+			.level h3 {
+				font-family: "Bungee", "Arial Black", sans-serif;
+				font-size: 0.95rem;
+				margin-bottom: 6px;
+			}
+
+			.game-over {
+				position: absolute;
+				inset: 0;
+				background: rgba(18, 20, 37, 0.6);
+				color: #fff;
+				display: grid;
+				place-items: center;
+				text-align: center;
+				border-radius: 16px;
+				opacity: 0;
+				pointer-events: none;
+				transition: opacity 0.2s ease;
+			}
+
+			.game-over.active {
+				opacity: 1;
+				pointer-events: all;
+			}
+
+			.game-over h2 {
+				font-family: "Bungee", "Arial Black", sans-serif;
+				margin-bottom: 8px;
+			}
+
+			@media (max-width: 960px) {
+				main {
+					padding: 32px;
+				}
+
+				.layout {
+					grid-template-columns: 1fr;
+				}
+			}
+
+			@media (max-width: 640px) {
+				main {
+					padding: 24px 18px 40px;
+					border-radius: 24px;
+				}
+
+				canvas {
+					height: 360px;
+				}
+
+				h1 {
+					font-size: 2rem;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<main>
+			<header>
+				<div class="eyebrow">Eco Adventure Arcade</div>
+				<h1>Eco Rush: <span>City Guardians</span></h1>
+				<p class="lead">
+					Collect clean energy, avoid pollution, plant trees, and save the planet. Tap left or right to
+					steer, swipe up for a short speed boost, and gather seeds to unlock tree planting bonuses.
+				</p>
+			</header>
+
+			<div class="layout">
+				<section class="panel">
+					<div class="hud">
+						<div class="hud-row">
+							<div id="levelLabel">Level 1: Clean Village</div>
+							<div>Eco Score <span id="score">0</span></div>
+						</div>
+						<div class="energy-bar">
+							<div class="energy-fill" id="energyFill"></div>
+						</div>
+						<div class="hud-row">
+							<div>Energy <span id="energy">100</span></div>
+							<div>Seeds <span id="seeds">0</span>/10</div>
+						</div>
+						<div class="hud-row">
+							<div>Coins <span id="coins">0</span></div>
+							<div>Boost <span id="boost">Ready</span></div>
+						</div>
+					</div>
+					<div class="game-wrap">
+						<canvas id="gameCanvas" width="720" height="420" aria-label="Eco car game"></canvas>
+						<div class="game-over" id="gameOver">
+							<div>
+								<h2>Uh-oh! Energy Depleted</h2>
+								<p>Your city needs you. Tap restart to try again.</p>
+								<button class="control-btn primary" id="restart">Restart</button>
+							</div>
+						</div>
+					</div>
+					<div class="controls">
+						<button class="control-btn" id="leftBtn">Tap Left</button>
+						<button class="control-btn primary" id="boostBtn">Swipe Up</button>
+						<button class="control-btn" id="rightBtn">Tap Right</button>
+					</div>
+					<div class="status-pill" id="status">Collect green items for points!</div>
+				</section>
+
+				<section class="panel">
+					<h2>How to Play</h2>
+					<ul class="list">
+						<li><span>Tap Left</span>Move to the left lane.</li>
+						<li><span>Tap Right</span>Move to the right lane.</li>
+						<li><span>Swipe Up</span>Short speed boost with a cooldown.</li>
+						<li><span>Energy</span>Game over when energy hits zero.</li>
+						<li><span>Plant Trees</span>Collect 10 seeds for bonus points.</li>
+					</ul>
+					<h2 style="margin-top: 20px;">Levels</h2>
+					<div class="levels">
+						<div class="level">
+							<h3>Level 1: Clean Village</h3>
+							<p>Gentle speed, friendly energy drops.</p>
+						</div>
+						<div class="level">
+							<h3>Level 2: Busy City</h3>
+							<p>More traffic and mixed item waves.</p>
+						</div>
+						<div class="level">
+							<h3>Level 3: Industrial Area</h3>
+							<p>Fast pace with dense smoke clouds.</p>
+						</div>
+						<div class="level">
+							<h3>Level 4: Forest Rescue</h3>
+							<p>High speed, bonus seeds, final sweep.</p>
+						</div>
+					</div>
+				</section>
+			</div>
+		</main>
+
+		<script>
+			const canvas = document.getElementById("gameCanvas");
+			const ctx = canvas.getContext("2d");
+			const leftBtn = document.getElementById("leftBtn");
+			const rightBtn = document.getElementById("rightBtn");
+			const boostBtn = document.getElementById("boostBtn");
+			const restartBtn = document.getElementById("restart");
+			const gameOverOverlay = document.getElementById("gameOver");
+			const scoreEl = document.getElementById("score");
+			const energyEl = document.getElementById("energy");
+			const energyFill = document.getElementById("energyFill");
+			const seedsEl = document.getElementById("seeds");
+			const coinsEl = document.getElementById("coins");
+			const boostEl = document.getElementById("boost");
+			const statusEl = document.getElementById("status");
+			const levelLabel = document.getElementById("levelLabel");
+
+			const lanes = [canvas.width * 0.28, canvas.width * 0.5, canvas.width * 0.72];
+			const player = {
+				lane: 1,
+				x: lanes[1],
+				y: canvas.height - 80,
+				width: 58,
+				height: 34,
+			};
+
+			const levels = [
+				{ name: "Clean Village", speed: 2.4, pollutionRate: 0.18 },
+				{ name: "Busy City", speed: 2.9, pollutionRate: 0.25 },
+				{ name: "Industrial Area", speed: 3.4, pollutionRate: 0.32 },
+				{ name: "Forest Rescue", speed: 3.8, pollutionRate: 0.28 },
+			];
+
+			let state = {};
+
+			function resetGame() {
+				state = {
+					score: 0,
+					energy: 100,
+					seeds: 0,
+					coins: 0,
+					levelIndex: 0,
+					items: [],
+					speedBoost: false,
+					boostReady: true,
+					boostTimer: 0,
+					spawnTimer: 0,
+					gameOver: false,
+				};
+				player.lane = 1;
+				player.x = lanes[player.lane];
+				updateHud();
+				gameOverOverlay.classList.remove("active");
+			}
+
+			function updateHud() {
+				scoreEl.textContent = state.score;
+				energyEl.textContent = Math.max(0, Math.round(state.energy));
+				energyFill.style.width = `${Math.max(0, state.energy)}%`;
+				seedsEl.textContent = state.seeds;
+				coinsEl.textContent = state.coins;
+				boostEl.textContent = state.boostReady ? "Ready" : "Cooling";
+				const level = levels[state.levelIndex];
+				levelLabel.textContent = `Level ${state.levelIndex + 1}: ${level.name}`;
+			}
+
+			function spawnItem() {
+				const level = levels[state.levelIndex];
+				const lane = Math.floor(Math.random() * lanes.length);
+				const roll = Math.random();
+				let type = "battery";
+				if (roll < level.pollutionRate) {
+					type = "bad";
+				} else if (roll > 0.78) {
+					type = "seed";
+				} else if (roll > 0.62) {
+					type = "solar";
+				} else if (roll > 0.5) {
+					type = "water";
+				}
+
+				state.items.push({
+					x: lanes[lane],
+					y: -30,
+					type,
+					width: 30,
+					height: 30,
+				});
+			}
+
+			function handleItem(item) {
+				if (item.type === "bad") {
+					state.energy -= 22;
+					statusEl.textContent = "Uh-oh! Pollution hit.";
+					return;
+				}
+
+				if (item.type === "seed") {
+					state.seeds += 1;
+					state.score += 40;
+					state.coins += 2;
+					statusEl.textContent = "Seed collected!";
+					if (state.seeds >= 10) {
+						state.seeds = 0;
+						state.score += 200;
+						state.coins += 10;
+						statusEl.textContent = "Tree planting bonus!";
+					}
+					return;
+				}
+
+				if (item.type === "solar") {
+					state.score += 55;
+					state.energy = Math.min(100, state.energy + 5);
+					statusEl.textContent = "Solar power collected!";
+					return;
+				}
+
+				if (item.type === "water") {
+					state.score += 30;
+					state.energy = Math.min(100, state.energy + 10);
+					statusEl.textContent = "Water drop boost!";
+					return;
+				}
+
+				state.score += 70;
+				state.energy = Math.min(100, state.energy + 12);
+				state.coins += 1;
+				statusEl.textContent = "Battery pack collected!";
+			}
+
+			function updateLevel() {
+				const nextLevel = Math.min(levels.length - 1, Math.floor(state.score / 400));
+				state.levelIndex = nextLevel;
+			}
+
+			function updateGame() {
+				if (state.gameOver) {
+					return;
+				}
+
+				const level = levels[state.levelIndex];
+				const speed = level.speed + (state.speedBoost ? 2 : 0);
+
+				state.spawnTimer += 1;
+				if (state.spawnTimer > 45) {
+					spawnItem();
+					state.spawnTimer = 0;
+				}
+
+				state.items.forEach((item) => {
+					item.y += speed;
+				});
+
+				state.items = state.items.filter((item) => item.y < canvas.height + 40);
+
+				state.items.forEach((item) => {
+					const hitX = Math.abs(item.x - player.x) < (item.width + player.width) / 2;
+					const hitY = Math.abs(item.y - player.y) < (item.height + player.height) / 2;
+					if (hitX && hitY) {
+						item.y = canvas.height + 100;
+						handleItem(item);
+					}
+				});
+
+				state.energy -= 0.12 + level.pollutionRate * 0.2;
+
+				if (state.speedBoost) {
+					state.boostTimer -= 1;
+					if (state.boostTimer <= 0) {
+						state.speedBoost = false;
+						boostEl.textContent = "Cooling";
+						setTimeout(() => {
+							state.boostReady = true;
+							boostEl.textContent = "Ready";
+						}, 2000);
+					}
+				}
+
+				if (state.energy <= 0) {
+					state.energy = 0;
+					state.gameOver = true;
+					gameOverOverlay.classList.add("active");
+				}
+
+				updateLevel();
+				updateHud();
+			}
+
+			function drawRoad() {
+				ctx.fillStyle = "#2f344a";
+				ctx.fillRect(canvas.width * 0.18, 0, canvas.width * 0.64, canvas.height);
+				ctx.fillStyle = "rgba(255,255,255,0.7)";
+				for (let i = 0; i < canvas.height; i += 40) {
+					ctx.fillRect(canvas.width * 0.5 - 3, i, 6, 20);
+				}
+			}
+
+			function drawPlayer() {
+				ctx.fillStyle = "#2ae6a1";
+				ctx.beginPath();
+				ctx.roundRect(player.x - player.width / 2, player.y - player.height / 2, player.width, player.height, 10);
+				ctx.fill();
+				ctx.fillStyle = "rgba(255,255,255,0.85)";
+				ctx.roundRect(player.x - 16, player.y - 10, 32, 12, 6);
+				ctx.fill();
+				ctx.fillStyle = "#1c2040";
+				ctx.beginPath();
+				ctx.arc(player.x - 6, player.y - 4, 3, 0, Math.PI * 2);
+				ctx.arc(player.x + 6, player.y - 4, 3, 0, Math.PI * 2);
+				ctx.fill();
+				ctx.fillStyle = "#101326";
+				ctx.fillRect(player.x - player.width / 2 + 6, player.y + 12, 14, 6);
+				ctx.fillRect(player.x + player.width / 2 - 20, player.y + 12, 14, 6);
+			}
+
+			function drawItem(item) {
+				let color = "#4ad66d";
+				let label = "B";
+				if (item.type === "bad") {
+					color = "#5a6078";
+					label = "X";
+				} else if (item.type === "seed") {
+					color = "#ffd166";
+					label = "S";
+				} else if (item.type === "solar") {
+					color = "#57b8ff";
+					label = "O";
+				} else if (item.type === "water") {
+					color = "#2ed5ff";
+					label = "W";
+				}
+
+				ctx.fillStyle = color;
+				ctx.beginPath();
+				ctx.roundRect(item.x - 16, item.y - 16, 32, 32, 10);
+				ctx.fill();
+				ctx.fillStyle = "rgba(0,0,0,0.5)";
+				ctx.font = "bold 12px Nunito";
+				ctx.textAlign = "center";
+				ctx.textBaseline = "middle";
+				ctx.fillText(label, item.x, item.y + 1);
+			}
+
+			function render() {
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				drawRoad();
+				state.items.forEach(drawItem);
+				drawPlayer();
+			}
+
+			function gameLoop() {
+				updateGame();
+				render();
+				requestAnimationFrame(gameLoop);
+			}
+
+			function moveLeft() {
+				if (state.gameOver) return;
+				player.lane = Math.max(0, player.lane - 1);
+				player.x = lanes[player.lane];
+			}
+
+			function moveRight() {
+				if (state.gameOver) return;
+				player.lane = Math.min(lanes.length - 1, player.lane + 1);
+				player.x = lanes[player.lane];
+			}
+
+			function activateBoost() {
+				if (!state.boostReady || state.gameOver) return;
+				state.boostReady = false;
+				state.speedBoost = true;
+				state.boostTimer = 90;
+				boostEl.textContent = "Boosting";
+				statusEl.textContent = "Speed boost!";
+			}
+
+			leftBtn.addEventListener("click", moveLeft);
+			rightBtn.addEventListener("click", moveRight);
+			boostBtn.addEventListener("click", activateBoost);
+			restartBtn.addEventListener("click", () => {
+				resetGame();
+			});
+
+			document.addEventListener("keydown", (event) => {
+				if (event.key === "ArrowLeft" || event.key === "a" || event.key === "A") moveLeft();
+				if (event.key === "ArrowRight" || event.key === "d" || event.key === "D") moveRight();
+				if (event.key === "ArrowUp" || event.key === "w" || event.key === "W") activateBoost();
+			});
+
+			let touchStartY = 0;
+			canvas.addEventListener("touchstart", (event) => {
+				touchStartY = event.touches[0].clientY;
+			});
+
+			canvas.addEventListener("touchend", (event) => {
+				const endY = event.changedTouches[0].clientY;
+				if (touchStartY - endY > 40) {
+					activateBoost();
+				}
+			});
+
+			canvas.addEventListener("click", (event) => {
+				const rect = canvas.getBoundingClientRect();
+				const clickX = event.clientX - rect.left;
+				if (clickX < rect.width / 2) {
+					moveLeft();
+				} else {
+					moveRight();
+				}
+			});
+
+			CanvasRenderingContext2D.prototype.roundRect =
+				CanvasRenderingContext2D.prototype.roundRect ||
+				function (x, y, w, h, r) {
+					this.beginPath();
+					this.moveTo(x + r, y);
+					this.arcTo(x + w, y, x + w, y + h, r);
+					this.arcTo(x + w, y + h, x, y + h, r);
+					this.arcTo(x, y + h, x, y, r);
+					this.arcTo(x, y, x + w, y, r);
+					this.closePath();
+					return this;
+				};
+
+			resetGame();
+			gameLoop();
+		</script>
+	</body>
+</html>

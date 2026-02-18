@@ -1,13 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎮 Game Hub</title>
+
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+/* Animated background */
+body {
+    background: linear-gradient(-45deg, #141e30, #243b55, #ff9800, #ff5722);
+    background-size: 400% 400%;
+    animation: gradientMove 12s ease infinite;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+</style>
 </head>
-<body>
-    <a href="./flappy-penguin.html">Play Flappy Penguin 3D</a>
-    <p>///////////////////////</p>
-    <a href="./valentine-card.html">Valentine</a>
+
+<body class="min-h-screen flex flex-col items-center text-white">
+
+<!-- HEADER -->
+<header class="text-center py-12">
+    <h1 class="text-5xl font-extrabold bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 bg-clip-text text-transparent drop-shadow-lg">
+        🎮 Ultimate Game Hub
+    </h1>
+    <p class="mt-4 text-lg text-gray-200">
+        Play my creative web games built with HTML, CSS & JavaScript 🚀
+    </p>
+</header>
+
+<!-- GAME GRID -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 w-11/12 max-w-6xl mb-16">
+
+    <!-- Game Card -->
+    <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-8 shadow-2xl transform transition duration-500 hover:scale-105 hover:shadow-orange-500/50">
+        <h2 class="text-2xl font-bold mb-3">🏃 Chota Bheem Runner</h2>
+        <p class="text-gray-200 mb-5">
+            Endless runner with leaderboard, power-ups & confetti effects.
+        </p>
+        <a href="bheem.html" 
+           class="inline-block px-6 py-3 rounded-xl font-bold bg-gradient-to-r from-orange-500 to-red-500 hover:from-yellow-400 hover:to-orange-500 transition duration-300 shadow-lg">
+            ▶ Play Now
+        </a>
+    </div>
+
+    <!-- Game Card -->
+    <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-8 shadow-2xl transform transition duration-500 hover:scale-105 hover:shadow-blue-500/50">
+        <h2 class="text-2xl font-bold mb-3">🐧 Flappy Penguin 3D</h2>
+        <p class="text-gray-200 mb-5">
+            Smooth flying arcade experience with fun gameplay.
+        </p>
+        <a href="flappy-penguin.html" 
+           class="inline-block px-6 py-3 rounded-xl font-bold bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-cyan-400 hover:to-blue-400 transition duration-300 shadow-lg">
+            ▶ Play Now
+        </a>
+    </div>
+
+    <!-- Game Card -->
+    <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-8 shadow-2xl transform transition duration-500 hover:scale-105 hover:shadow-pink-500/50">
+        <h2 class="text-2xl font-bold mb-3">💖 Valentine Card</h2>
+        <p class="text-gray-200 mb-5">
+            Romantic interactive animated card experience.
+        </p>
+        <a href="valentine-card.html" 
+           class="inline-block px-6 py-3 rounded-xl font-bold bg-gradient-to-r from-pink-500 to-red-500 hover:from-red-400 hover:to-pink-400 transition duration-300 shadow-lg">
+            ▶ Open Card
+        </a>
+    </div>
+
+    <!-- Game Card -->
+    <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-8 shadow-2xl transform transition duration-500 hover:scale-105 hover:shadow-green-500/50">
+        <h2 class="text-2xl font-bold mb-3">🎯 Classic Game</h2>
+        <p class="text-gray-200 mb-5">
+            Fun arcade-style browser game for quick entertainment.
+        </p>
+        <a href="game.html" 
+           class="inline-block px-6 py-3 rounded-xl font-bold bg-gradient-to-r from-green-500 to-emerald-500 hover:from-emerald-400 hover:to-green-400 transition duration-300 shadow-lg">
+            ▶ Play Now
+        </a>
+    </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="mb-6 text-gray-200 text-sm">
+    © 2026 Built with ❤️ | Hosted on GitHub Pages
+</footer>
+
 </body>
 </html>

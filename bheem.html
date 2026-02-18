@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chota Bheem Runner</title>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:linear-gradient(135deg,#f6d365,#fda085);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+/* TITLE */
+#gameTitle{
+    margin-top:15px;
+    margin-bottom:15px;
+    font-size:32px;
+    font-weight:bold;
+    color:white;
+    text-align:center;
+    text-shadow:0 0 10px #fff,0 0 20px #ff9800,0 0 30px #ff5722;
+    animation:glow 1.5s infinite alternate;
+}
+@keyframes glow{
+    from{ text-shadow:0 0 10px #fff,0 0 20px #ff9800; }
+    to{ text-shadow:0 0 25px #fff,0 0 50px #ff9800; }
+}
+
+/* WRAPPER */
+#mainWrapper{
+    display:flex;
+    gap:30px;
+    align-items:center;
+}
+
+/* GAME */
+#gameContainer{
+    position:relative;
+    width:1000px;
+    height:520px;
+    overflow:hidden;
+    border-radius:25px;
+    border:4px solid #f57c00;
+    box-shadow:0 20px 50px rgba(0,0,0,0.4);
+    background-image:url("village.png");
+    background-size:cover;
+    background-position:0 0;
+}
+
+/* BHEEM */
+#bheem{
+    position:absolute;
+    bottom:40px;
+    left:80px;
+    width:110px;
+    transition:bottom 0.35s ease-out;
+}
+#bheem img{ width:100%; }
+
+/* LADDOO */
+.laddoo{
+    position:absolute;
+    width:22px;
+    height:22px;
+    background:radial-gradient(circle,#ffcc00 40%,#ff8800 70%);
+    border-radius:50%;
+    border:3px solid #cc6600;
+}
+
+/* OBSTACLE */
+.obstacle{
+    position:absolute;
+    width:35px;
+    height:35px;
+    background:brown;
+    bottom:40px;
+    border-radius:5px;
+}
+
+/* FLOATING SCORE */
+.floatingScore{
+    position:absolute;
+    color:white;
+    font-weight:bold;
+    font-size:24px;
+    text-shadow:2px 2px 0px black, -2px -2px 0px black, 0 0 10px #00e5ff;
+    animation:floatUp 1s ease-out forwards;
+    pointer-events:none;
+}
+@keyframes floatUp{
+    0%{opacity:1; transform:translateY(0);}
+    100%{opacity:0; transform:translateY(-70px);}
+}
+
+/* UI */
+#score,#highScore,#lives{
+    position:absolute;
+    top:10px;
+    font-size:18px;
+    font-weight:bold;
+    color:white;
+    background:rgba(0,0,0,0.6);
+    padding:5px 10px;
+    border-radius:10px;
+}
+#score{ left:20px; }
+#highScore{ right:20px; }
+#lives{
+    left:50%;
+    transform:translateX(-50%);
+    font-size:22px;
+    letter-spacing:5px;
+    color:red;
+}
+
+/* LEADERBOARD */
+#leaderboard{
+    width:260px;
+    height:520px;
+    backdrop-filter: blur(12px);
+    background: rgba(255,255,255,0.15);
+    border:1px solid rgba(255,255,255,0.3);
+    border-radius:20px;
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+}
+
+#leaderboard h3{
+    text-align:center;
+    margin-bottom:15px;
+}
+
+#leaderboardList{
+    flex:1;
+    overflow-y:auto;
+}
+
+.playerCard{
+    display:flex;
+    justify-content:space-between;
+    padding:8px 12px;
+    margin-bottom:8px;
+    border-radius:10px;
+    background:rgba(0,0,0,0.5);
+}
+
+.scoreBadge{
+    background:gold;
+    padding:4px 8px;
+    border-radius:8px;
+    font-weight:bold;
+}
+
+.topPlayer{
+    background:gold;
+    color:black;
+    font-weight:bold;
+}
+
+#resetLeaderboard{
+    margin-top:10px;
+    padding:8px;
+    background:crimson;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+/* OVERLAYS */
+.overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.85);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    color:white;
+    z-index:2000;
+    text-align:center;
+}
+.hidden{ display:none; }
+
+input{
+    padding:8px;
+    font-size:16px;
+    margin:10px 0;
+}
+
+/* GAME OVER */
+#gameOverScreen{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.6);
+    display:none;
+    justify-content:center;
+    align-items:center;
+}
+#gameOverBox{
+    background:#fffbe7;
+    padding:30px 50px;
+    border-radius:12px;
+    text-align:center;
+}
+#restartBtn{
+    margin-top:20px;
+    padding:8px 20px;
+    background:#f57c00;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h1 id="gameTitle">🏃 Chota Bheem Runner</h1>
+
+<div id="instructionScreen" class="overlay">
+    <h1>🎮 HOW TO PLAY</h1>
+    <p>Press SPACE to Jump</p>
+    <p>Collect Laddoos 🍡</p>
+    <p>Avoid Obstacles 🧱</p>
+    <p>You have 3 Lives ❤️</p>
+    <p style="margin-top:20px;font-weight:bold;">Press SPACE to Continue</p>
+</div>
+
+<div id="nameScreen" class="overlay hidden">
+    <h2>Enter Your Name</h2>
+    <input type="text" id="playerNameInput" placeholder="Your Name">
+    <p>Press SPACE to Start</p>
+</div>
+
+<div id="mainWrapper">
+
+<div id="gameContainer">
+    <div id="bheem"><img src="bheem.png"></div>
+    <div id="score">Score: 0</div>
+    <div id="highScore">High Score: 0</div>
+    <div id="lives">❤️❤️❤️</div>
+</div>
+
+<div id="leaderboard">
+    <h3>🏆 Leaderboard</h3>
+    <div id="leaderboardList"></div>
+    <button id="resetLeaderboard">🗑 Reset Leaderboard</button>
+</div>
+
+</div>
+
+<div id="gameOverScreen">
+    <div id="gameOverBox">
+        <h2>Game Over!</h2>
+        <p id="finalScore"></p>
+        <button id="restartBtn">Restart Game</button>
+    </div>
+</div>
+
+<script>
+const bheem=document.getElementById('bheem');
+const gameContainer=document.getElementById('gameContainer');
+const scoreDisplay=document.getElementById('score');
+const highScoreDisplay=document.getElementById('highScore');
+const livesDisplay=document.getElementById('lives');
+const leaderboardList=document.getElementById("leaderboardList");
+const resetLeaderboardBtn=document.getElementById("resetLeaderboard");
+const instructionScreen=document.getElementById("instructionScreen");
+const nameScreen=document.getElementById("nameScreen");
+const playerNameInput=document.getElementById("playerNameInput");
+const gameOverScreen=document.getElementById("gameOverScreen");
+const finalScoreText=document.getElementById("finalScore");
+const restartBtn=document.getElementById("restartBtn");
+
+let gameState="instructions";
+let playerName="";
+let score=0;
+let lives=3;
+let laddoos=[];
+let obstacles=[];
+let isJumping=false;
+let speed=4;
+let backgroundX=0;
+let gameOver=false;
+
+let spawnInterval;
+let obstacleInterval;
+
+let highScore=localStorage.getItem("bheemHighScore")||0;
+highScoreDisplay.textContent="High Score: "+highScore;
+
+/* Leaderboard */
+function saveScore(newScore){
+    let scores=JSON.parse(localStorage.getItem("bheemLeaderboard"))||[];
+    scores.push({name:playerName,score:newScore});
+    scores.sort((a,b)=>b.score-a.score);
+    scores=scores.slice(0,5);
+    localStorage.setItem("bheemLeaderboard",JSON.stringify(scores));
+}
+
+function displayLeaderboard(){
+    let scores=JSON.parse(localStorage.getItem("bheemLeaderboard"))||[];
+    leaderboardList.innerHTML="";
+    scores.forEach((entry,i)=>{
+        let medal=i===0?"🥇":i===1?"🥈":i===2?"🥉":"";
+        let card=document.createElement("div");
+        card.className="playerCard";
+        if(i===0) card.classList.add("topPlayer");
+        card.innerHTML=`
+            <span>${medal} ${entry.name}</span>
+            <span class="scoreBadge">${entry.score}</span>
+        `;
+        leaderboardList.appendChild(card);
+    });
+}
+displayLeaderboard();
+
+resetLeaderboardBtn.onclick=()=>{
+    localStorage.removeItem("bheemLeaderboard");
+    displayLeaderboard();
+};
+
+/* Floating Score */
+function showFloatingScore(x,y,value){
+    const popup=document.createElement("div");
+    popup.className="floatingScore";
+    popup.textContent="+"+value;
+    popup.style.left=x+"px";
+    popup.style.top=y+"px";
+    gameContainer.appendChild(popup);
+    setTimeout(()=>popup.remove(),1000);
+}
+
+/* Space Controller */
+document.addEventListener("keydown",(e)=>{
+    if(e.code!=="Space") return;
+
+    if(gameState==="instructions"){
+        instructionScreen.classList.add("hidden");
+        nameScreen.classList.remove("hidden");
+        gameState="name";
+        return;
+    }
+
+    if(gameState==="name"){
+        if(!playerNameInput.value.trim()){
+            alert("Enter your name!");
+            return;
+        }
+        playerName=playerNameInput.value.trim();
+        nameScreen.classList.add("hidden");
+        startGame();
+        return;
+    }
+
+    if(gameState==="playing"){
+        if(!isJumping && !gameOver){
+            isJumping=true;
+            bheem.style.bottom="300px";
+            setTimeout(()=>{
+                bheem.style.bottom="40px";
+                setTimeout(()=>{isJumping=false;},350);
+            },350);
+        }
+    }
+});
+
+function startGame(){
+    gameState="playing";
+    spawnInterval=setInterval(spawnLaddoo,1000);
+    obstacleInterval=setInterval(spawnObstacle,4000);
+    gameLoop();
+}
+
+function moveBackground(){
+    backgroundX-=speed/2;
+    gameContainer.style.backgroundPosition=backgroundX+"px 0";
+}
+
+function spawnLaddoo(){
+    const l=document.createElement("div");
+    l.className="laddoo";
+    l.style.left=gameContainer.clientWidth+"px";
+    l.style.bottom=(Math.random()>0.5?40:200)+"px";
+    gameContainer.appendChild(l);
+    laddoos.push(l);
+}
+
+function spawnObstacle(){
+    const o=document.createElement("div");
+    o.className="obstacle";
+    o.style.left=gameContainer.clientWidth+"px";
+    gameContainer.appendChild(o);
+    obstacles.push(o);
+}
+
+function updateLives(){ livesDisplay.innerHTML="❤️".repeat(lives); }
+updateLives();
+
+function gameLoop(){
+    if(gameState!=="playing"||gameOver) return;
+
+    speed=4+(score*0.05);
+    moveBackground();
+
+    laddoos.forEach((l,i)=>{
+        let left=parseInt(l.style.left);
+        left-=speed;
+        l.style.left=left+"px";
+
+        const br=bheem.getBoundingClientRect();
+        const lr=l.getBoundingClientRect();
+        const containerRect=gameContainer.getBoundingClientRect();
+
+        if(lr.left<br.right&&lr.right>br.left&&lr.bottom>br.top&&lr.top<br.bottom){
+            const popupX=br.left-containerRect.left+40;
+            const popupY=br.top-containerRect.top;
+            showFloatingScore(popupX,popupY,2);
+
+            l.remove();
+            laddoos.splice(i,1);
+            score+=2;
+            scoreDisplay.textContent="Score: "+score;
+        }
+
+        if(left<-50){
+            l.remove();
+            laddoos.splice(i,1);
+        }
+    });
+
+    obstacles.forEach((o,i)=>{
+        let left=parseInt(o.style.left);
+        left-=speed;
+        o.style.left=left+"px";
+
+        const br=bheem.getBoundingClientRect();
+        const or=o.getBoundingClientRect();
+        const bheemBottom=parseInt(bheem.style.bottom);
+
+        if(or.left<br.right-10&&or.right>br.left+10&&
+           or.bottom>br.top+10&&or.top<br.bottom-10&&
+           bheemBottom<=80){
+            o.remove();
+            obstacles.splice(i,1);
+            lives--;
+            updateLives();
+            if(lives<=0) endGame();
+        }
+
+        if(left<-50){
+            o.remove();
+            obstacles.splice(i,1);
+        }
+    });
+
+    requestAnimationFrame(gameLoop);
+}
+
+function endGame(){
+    gameOver=true;
+    clearInterval(spawnInterval);
+    clearInterval(obstacleInterval);
+
+    if(score>highScore){
+        highScore=score;
+        localStorage.setItem("bheemHighScore",score);
+        highScoreDisplay.textContent="High Score: "+highScore;
+        confetti();
+    }
+
+    saveScore(score);
+    displayLeaderboard();
+
+    finalScoreText.textContent="Final Score: "+score;
+    gameOverScreen.style.display="flex";
+}
+
+restartBtn.onclick=()=>location.reload();
+</script>
+
+</body>
+</html>
