@@ -16,22 +16,140 @@ body{
     flex-direction:column;
     align-items:center;
 }
+@media (max-width: 600px) {
+    #mainWrapper {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+    #gameContainer {
+        width: 98vw;
+        max-width: 400px;
+        height: 320px;
+        border-radius: 15px;
+        border-width: 2px;
+    }
+    #leaderboard {
+        width: 98vw;
+        max-width: 400px;
+        height: auto;
+        min-height: 120px;
+        border-radius: 15px;
+        padding: 10px;
+    }
+    #gameTitle {
+        font-size: 28px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+    .titleIcon {
+        font-size: 24px;
+    }
+    .titleText {
+        font-size: 22px;
+    }
+    #score, #highScore, #lives {
+        font-size: 14px;
+        padding: 3px 6px;
+        border-radius: 6px;
+    }
+    #lives {
+        font-size: 16px;
+    }
+    input {
+        font-size: 14px;
+        padding: 6px;
+    }
+    #gameOverBox {
+        padding: 15px 10px;
+        border-radius: 8px;
+    }
+    #restartBtn, #resetLeaderboard {
+        font-size: 14px;
+        padding: 6px 12px;
+        border-radius: 6px;
+    }
+    .playerCard {
+        font-size: 14px;
+        padding: 4px 6px;
+        border-radius: 6px;
+    }
+    .scoreBadge {
+        font-size: 13px;
+        padding: 2px 5px;
+        border-radius: 5px;
+    }
+    .floatingScore {
+        font-size: 16px;
+    }
+    .laddoo {
+        width: 16px;
+        height: 16px;
+        border-width: 2px;
+    }
+    .obstacle {
+        width: 22px;
+        height: 22px;
+        border-radius: 3px;
+    }
+    #bheem {
+        width: 60px;
+        left: 20px;
+        bottom: 20px;
+    }
+    .magnet {
+        width: 18px;
+        height: 18px;
+        border-width: 2px;
+    }
+    #magnetIndicator {
+        font-size: 13px;
+        padding: 3px 7px;
+        border-radius: 12px;
+    }
+}
 
 /* TITLE */
 #gameTitle{
-    margin-top:15px;
-    margin-bottom:15px;
-    font-size:32px;
-    font-weight:bold;
-    color:white;
+    margin-top:20px;
+    margin-bottom:20px;
+    font-size:42px;
+    font-weight:900;
     text-align:center;
-    text-shadow:0 0 10px #fff,0 0 20px #ff9800,0 0 30px #ff5722;
-    animation:glow 1.5s infinite alternate;
+    letter-spacing:3px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:15px;
 }
-@keyframes glow{
-    from{ text-shadow:0 0 10px #fff,0 0 20px #ff9800; }
-    to{ text-shadow:0 0 25px #fff,0 0 50px #ff9800; }
+
+/* Gradient Animated Text */
+.titleText{
+    background:linear-gradient(90deg,#ff0000,#ff9800,#ffff00,#ff0000);
+    background-size:300% 300%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:gradientMove 4s linear infinite;
+    text-shadow:0 0 25px rgba(255,100,0,0.6);
 }
+
+/* Fire Icons Animation */
+.titleIcon{
+    font-size:38px;
+    animation:firePulse 1.5s infinite alternate;
+}
+
+@keyframes gradientMove{
+    0%{ background-position:0% 50%; }
+    50%{ background-position:100% 50%; }
+    100%{ background-position:0% 50%; }
+}
+
+@keyframes firePulse{
+    from{ transform:scale(1); }
+    to{ transform:scale(1.3); }
+}
+
 
 /* WRAPPER */
 #mainWrapper{
@@ -220,12 +338,42 @@ input{
     border-radius:8px;
     cursor:pointer;
 }
+
+/* MAGNET POWER */
+.magnet{
+    position:absolute;
+    width:30px;
+    height:30px;
+    background: radial-gradient(circle, #00e5ff 40%, #0077ff 80%);
+    border-radius:50%;
+    border:3px solid white;
+    box-shadow:0 0 15px #00e5ff;
+}
+
+/* Magnet Active Indicator */
+#magnetIndicator{
+    position:absolute;
+    top:60px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#00e5ff;
+    color:black;
+    padding:6px 12px;
+    border-radius:20px;
+    font-weight:bold;
+    display:none;
+}
+
 </style>
 </head>
 
 <body>
 
-<h1 id="gameTitle">🏃 Chota Bheem Runner</h1>
+<h1 id="gameTitle">
+    <span class="titleIcon">🔥</span>
+    <span class="titleText">CHOTA BHEEM RUNNER</span>
+    <span class="titleIcon">🔥</span>
+</h1>
 
 <div id="instructionScreen" class="overlay">
     <h1>🎮 HOW TO PLAY</h1>
@@ -249,6 +397,7 @@ input{
     <div id="score">Score: 0</div>
     <div id="highScore">High Score: 0</div>
     <div id="lives">❤️❤️❤️</div>
+    
 </div>
 
 <div id="leaderboard">
@@ -374,6 +523,42 @@ document.addEventListener("keydown",(e)=>{
         }
     }
 });
+
+// Touch Controls for Mobile
+function handleTouchJump(e) {
+    if(gameState==="instructions"){
+        instructionScreen.classList.add("hidden");
+        nameScreen.classList.remove("hidden");
+        gameState="name";
+        return;
+    }
+    if(gameState==="name"){
+        if(!playerNameInput.value.trim()){
+            alert("Enter your name!");
+            return;
+        }
+        playerName=playerNameInput.value.trim();
+        nameScreen.classList.add("hidden");
+        startGame();
+        return;
+    }
+    if(gameState==="playing"){
+        if(!isJumping && !gameOver){
+            isJumping=true;
+            bheem.style.bottom="300px";
+            setTimeout(()=>{
+                bheem.style.bottom="40px";
+                setTimeout(()=>{isJumping=false;},350);
+            },350);
+        }
+    }
+}
+
+// Add touch event listeners for mobile
+gameContainer.addEventListener("touchstart", handleTouchJump);
+instructionScreen.addEventListener("touchstart", handleTouchJump);
+nameScreen.addEventListener("touchstart", handleTouchJump);
+gameOverScreen.addEventListener("touchstart", ()=>location.reload());
 
 function startGame(){
     gameState="playing";
