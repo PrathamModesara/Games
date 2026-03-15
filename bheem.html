@@ -48,10 +48,30 @@ body{
     .titleText {
         font-size: 22px;
     }
+    /* Stack game UI vertically for mobile */
+    .mobile-ui-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: absolute;
+        top: 8px;
+        left: 0;
+        width: 100%;
+        z-index: 10;
+        pointer-events: none;
+    }
     #score, #highScore, #lives {
+        position: static;
+        display: block;
+        margin: 0 auto 6px auto;
+        background: rgba(0,0,0,0.7);
+        text-align: center;
+        width: 90vw;
+        max-width: 350px;
         font-size: 14px;
         padding: 3px 6px;
         border-radius: 6px;
+        pointer-events: auto;
     }
     #lives {
         font-size: 16px;
@@ -394,9 +414,11 @@ input{
 
 <div id="gameContainer">
     <div id="bheem"><img src="bheem.png"></div>
-    <div id="score">Score: 0</div>
-    <div id="highScore">High Score: 0</div>
-    <div id="lives">❤️❤️❤️</div>
+    <div class="mobile-ui-wrapper">
+        <div id="score">Score: 0</div>
+        <div id="highScore">High Score: 0</div>
+        <div id="lives">❤️❤️❤️</div>
+    </div>
     
 </div>
 
